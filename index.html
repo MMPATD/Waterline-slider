@@ -152,58 +152,67 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const wrapper = document.getElementById("wrapper");
-      const track = document.getElementById("sliderTrack");
-      const thumb = document.getElementById("sliderThumb");
-      const root = document.documentElement;
+    <script>
+  window.addEventListener("load", () => {
+    const wrapper = document.getElementById("wrapper");
+    const track = document.getElementById("sliderTrack");
+    const thumb = document.getElementById("sliderThumb");
+    const baseImage = wrapper.querySelector(".base");
+    const root = document.documentElement;
 
-      let value = 40; // starting reveal percentage
-      let dragging = false;
+    let value = 40; // starting reveal percentage
+    let dragging = false;
 
-      function setReveal(percent) {
-       
- value = Math.max(0, Math.min(100, percent));
-  root.style.setProperty("--reveal", value + "%");
+    function setReveal(percent) {
+      value = Math.max(0, Math.min(100, percent));
+      root.style.setProperty("--reveal", value + "%");
 
-  const trackHeight = track.clientHeight;
-  const thumbHeight = thumb.offsetHeight;
-  const thumbY = (value / 100) * trackHeight - (thumbHeight / 2);
+      const trackHeight = track.clientHeight;
+      const thumbHeight = thumb.offsetHeight;
 
-  thumb.style.top = `${thumbY}px`;
-}
+      const thumbY = (value / 100) * trackHeight - (thumbHeight / 2);
+      const clampedY = Math.max(0, Math.min(trackHeight - thumbHeight, thumbY));
 
-      function updateFromPointer(clientY) {
-        const rect = track.getBoundingClientRect();
-        const y = clientY - rect.top;
-        const percent = (y / rect.height) * 100;
-        setReveal(percent);
-      }
+      thumb.style.top = `${clampedY}px`;
+    }
 
-      thumb.addEventListener("pointerdown", (e) => {
-        dragging = true;
-        thumb.setPointerCapture(e.pointerId);
-      });
+    function updateFromPointer(clientY) {
+      const rect = track.getBoundingClientRect();
+      const y = clientY - rect.top;
+      const percent = (y / rect.height) * 100;
+      setReveal(percent);
+    }
 
-      window.addEventListener("pointermove", (e) => {
-        if (!dragging) return;
-        updateFromPointer(e.clientY);
-      });
+    thumb.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      thumb.setPointerCapture(e.pointerId);
+    });
 
-      window.addEventListener("pointerup", () => {
-        dragging = false;
-      });
+    window.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      updateFromPointer(e.clientY);
+    });
 
-      track.addEventListener("click", (e) => {
-        updateFromPointer(e.clientY);
-      });
+    window.addEventListener("pointerup", () => {
+      dragging = false;
+    });
 
-      window.addEventListener("resize", () => {
-        setReveal(value);
-      });
+    track.addEventListener("click", (e) => {
+      updateFromPointer(e.clientY);
+    });
 
+    window.addEventListener("resize", () => {
       setReveal(value);
     });
+
+    // If image is already loaded, set immediately
+    if (baseImage.complete) {
+      setReveal(value);
+    } else {
+      baseImage.addEventListener("load", () => setReveal(value));
+    }
+  });
+</script>
   </script>
 
 </body>
