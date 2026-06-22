@@ -1,189 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Waterline Slider</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Waterline Slider</title>
 
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-  }
+  <style>
+    :root {
+      --reveal: 40%;
+    }
 
-  .container {
-    max-width: 900px;
-    margin: 20px auto;
-    padding: 10px;
-  }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
 
-  .instruction {
-    text-align: center;
-    color: #d7763c;
-    font-style: italic;
-    margin-bottom: 12px;
-  }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 10px;
+    }
 
-  .image-wrapper {
-    position: relative;
-    overflow: hidden;
-    border-radius: 10px;
-  }
+    .instruction {
+      text-align: center;
+      color: #d7763c;
+      font-style: italic;
+      margin-bottom: 12px;
+    }
 
-  img.base {
-    width: 100%;
-    display: block;
-  }
+    .image-wrapper {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      line-height: 0;
+    }
 
-  /* Overlay reveal */
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    transition: height 0.15s ease-out;
-  }
+    .base {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
 
-  .overlay img {
-   
-position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
+    /* Full overlay layer */
+    .overlay-layer {
+      position: absolute;
+      inset: 0;
+      background: url("iceberg-overlay.png") top center / 100% 100% no-repeat;
+      clip-path: inset(0 0 calc(100% - var(--reveal)) 0);
+      z-index: 2;
+      pointer-events: none;
+    }
 
-  /* Soft gradient "waterline" edge */
-  .overlay::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: -50%;
-  width: 200%;
-  height: 6px;
-  filter: blur(1px);
-  background: linear-gradient(
-    90deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.8) 50%,
-    rgba(255,255,255,0) 100%
-  );
+    /* Waterline shimmer */
+    .waterline {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(var(--reveal) - 3px);
+      height: 6px;
+      z-index: 3;
+      pointer-events: none;
+      overflow: hidden;
+    }
 
-  opacity: 0.7;
-  pointer-events: none;
+    .waterline::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.85) 50%,
+        rgba(255,255,255,0) 100%
+      );
+      filter: blur(1px);
+      opacity: 0.85;
+      animation: shimmer 3s linear infinite;
+      transform: translateX(-50%);
+    }
 
-  animation: shimmer 3s infinite linear;
-}
+    @keyframes shimmer {
+      from {
+        transform: translateX(-50%);
+      }
+      to {
+        transform: translateX(50%);
+      }
+    }
 
-  /* Slider container */
-  .slider {
-    position: absolute;
-    right: 10px;
-    top: 0;
-    height: 100%;
-    z-index: 20;
-  }
-  
+    /* Custom slider */
+    .slider {
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      right: 12px;
+      width: 28px;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
 
-  input[type="range"] {
-    position: relative;
-    z-index: 11;
-    writing-mode: vertical-lr;
-    appearance: none;
-    width: 12px;
-    height: 100%;
-    background: transparent;
-  }
+    .slider-track {
+      position: relative;
+      width: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.65);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+      cursor: pointer;
+    }
 
-  /* Track */
-  input[type="range"]::-webkit-slider-runnable-track {
-    width: 6px;
-    background: #999;
-    border-radius: 3px;
-  }
+    .slider-thumb {
+      position: absolute;
+      left: 50%;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #222;
+      border: 3px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      transform: translate(-50%, -50%);
+      cursor: grab;
+      touch-action: none;
+    }
 
-  /* Thumb */
-  input[type="range"]::-webkit-slider-thumb {
-    appearance: none;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: #222;
-    cursor: grab;
-    border: 3px solid white;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  }
-
-  input[type="range"]:active::-webkit-slider-thumb {
-    cursor: grabbing;
-    transform: scale(1.1);
-  }
-
-  
-@keyframes shimmer {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(50%);
-  }
-}
-
-</style>
+    .slider-thumb:active {
+      cursor: grabbing;
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="container">
-
-  <div class="instruction">
-    Click on the slider and drag it down to reveal more details.
-  </div>
-
-  <div class="image-wrapper">
-
-    <!-- Fully visible image -->
-    <img src="iceberg-base.png" class="base" alt="Iceberg image">
-
-    <!-- Hidden overlay -->
-    <div class="overlay" id="overlay">
-      <img src="iceberg-overlay.png" alt="Revealed details">
+  <div class="container">
+    <div class="instruction">
+      Drag the slider to reveal more details.
     </div>
 
-    <!-- Slider -->
-    <div class="slider">
-      <input 
-        type="range" 
-        min="0" 
-        max="100" 
-        value="40"
-        id="slider"
-      >
-    </div>
+    <div class="image-wrapper" id="wrapper">
+      <img src="iceberg-base.png" class="base" alt="Iceberg image" />
 
+      <div class="overlay-layer" id="overlayLayer"></div>
+      <div class="waterline" id="waterline"></div>
+
+      <div class="slider" aria-label="Reveal slider">
+        <div class="slider-track" id="sliderTrack">
+          <div class="slider-thumb" id="sliderThumb"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-</div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const wrapper = document.getElementById("wrapper");
+      const track = document.getElementById("sliderTrack");
+      const thumb = document.getElementById("sliderThumb");
+      const root = document.documentElement;
 
+      let value = 40; // starting reveal percentage
+      let dragging = false;
 
-<script>
-  
-document.addEventListener("DOMContentLoaded", () => {
-  const slider = document.getElementById("slider");
-  const overlay = document.getElementById("overlay");
+      function setReveal(percent) {
+        value = Math.max(0, Math.min(100, percent));
+        root.style.setProperty("--reveal", value + "%");
 
-  overlay.style.height = slider.value + "%";
+        const trackHeight = track.clientHeight;
+        const thumbY = (value / 100) * trackHeight;
+        thumb.style.top = `${thumbY}px`;
+      }
 
-  slider.addEventListener("input", () => {
-    requestAnimationFrame(() => {
-      overlay.style.height = slider.value + "%";
+      function updateFromPointer(clientY) {
+        const rect = track.getBoundingClientRect();
+        const y = clientY - rect.top;
+        const percent = (y / rect.height) * 100;
+        setReveal(percent);
+      }
+
+      thumb.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        thumb.setPointerCapture(e.pointerId);
+      });
+
+      window.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        updateFromPointer(e.clientY);
+      });
+
+      window.addEventListener("pointerup", () => {
+        dragging = false;
+      });
+
+      track.addEventListener("click", (e) => {
+        updateFromPointer(e.clientY);
+      });
+
+      window.addEventListener("resize", () => {
+        setReveal(value);
+      });
+
+      setReveal(value);
     });
-  });
-});
-
-</script>
-
+  </script>
 
 </body>
 </html>
