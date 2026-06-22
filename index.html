@@ -162,13 +162,16 @@
       let dragging = false;
 
       function setReveal(percent) {
-        value = Math.max(0, Math.min(100, percent));
-        root.style.setProperty("--reveal", value + "%");
+       
+ value = Math.max(0, Math.min(100, percent));
+  root.style.setProperty("--reveal", value + "%");
 
-        const trackHeight = track.clientHeight;
-        const thumbY = (value / 100) * trackHeight;
-        thumb.style.top = `${thumbY}px`;
-      }
+  const trackHeight = track.clientHeight;
+  const thumbHeight = thumb.offsetHeight;
+  const thumbY = (value / 100) * trackHeight - (thumbHeight / 2);
+
+  thumb.style.top = `${thumbY}px`;
+}
 
       function updateFromPointer(clientY) {
         const rect = track.getBoundingClientRect();
