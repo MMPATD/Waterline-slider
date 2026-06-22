@@ -105,6 +105,7 @@
     .slider-track {
       position: relative;
       width: 6px;
+      height: 100%;
       border-radius: 999px;
       background: rgba(255,255,255,0.65);
       box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
@@ -164,16 +165,17 @@
     let dragging = false;
 
     function setReveal(percent) {
-      value = Math.max(0, Math.min(100, percent));
-      root.style.setProperty("--reveal", value + "%");
+  value = Math.max(0, Math.min(100, percent));
+  root.style.setProperty("--reveal", value + "%");
 
-      const trackHeight = track.clientHeight;
-      const thumbHeight = thumb.offsetHeight;
+  const trackHeight = track.clientHeight;
+  const thumbHeight = thumb.offsetHeight;
 
-      const thumbY = (value / 100) * trackHeight - (thumbHeight / 2);
-      const clampedY = Math.max(0, Math.min(trackHeight - thumbHeight, thumbY));
+  const thumbY = (value / 100) * trackHeight - (thumbHeight / 2);
 
-      thumb.style.top = `${clampedY}px`;
+  thumb.style.top = `${thumbY}px`;
+}
+``
     }
 
     function updateFromPointer(clientY) {
