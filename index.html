@@ -139,7 +139,7 @@ input[type="range"] {
         type="range" 
         min="0" 
         max="100" 
-        value="50"
+        value="30"
         id="slider"
       >
     </div>
@@ -148,22 +148,22 @@ input[type="range"] {
 
 </div>
 
+
 <script>
-  
-const slider = document.getElementById("slider");
-const overlay = document.getElementById("overlay");
+  const slider = document.getElementById("slider");
+  const overlay = document.getElementById("overlay");
 
-// Set starting position
-overlay.style.height = slider.value + "%";
+  // Set starting position
+  overlay.style.height = slider.value + "%";
 
-// Update on drag
-slider.addEventListener("input", () => {
-  requestAnimationFrame(() => {
-    overlay.style.height = slider.value + "%";
+  // Update on drag
+  slider.addEventListener("input", () => {
+    requestAnimationFrame(() => {
+      overlay.style.height = slider.value + "%";
+    });
   });
-});
-
 </script>
+
 
 </body>
 </html>
