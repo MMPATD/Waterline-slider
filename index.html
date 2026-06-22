@@ -67,12 +67,18 @@
   /* Slider container */
   .slider {
     position: absolute;
-    right: -30px;
+    right: 10px;
     top: 0;
     height: 100%;
     display: flex;
     align-items: center;
+    z-index: 10;
   }
+  
+input[type="range"] {
+  position: relative;
+  z-index: 11;
+}
 
   input[type="range"] {
     writing-mode: vertical-lr;
