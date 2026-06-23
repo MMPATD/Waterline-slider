@@ -23,7 +23,7 @@
     }
 
     .instruction {
-      text-align: centre;
+      text-align: center;
       color: #d7763c;
       font-style: italic;
       margin-bottom: 12px;
@@ -34,6 +34,7 @@
       overflow: hidden;
       border-radius: 10px;
       display: block;
+      line-height: 0;
     }
 
     .base {
@@ -42,11 +43,14 @@
       height: auto;
     }
 
-    /* Overlay image clipped to reveal amount */
+    /* Overlay image */
     .overlay-layer {
       position: absolute;
       inset: 0;
-      background: url("iceberg-overlay.png") top centre / cover no-repeat;
+      background-image: url("iceberg-overlay.png");
+      background-repeat: no-repeat;
+      background-position: top center;
+      background-size: cover;
       clip-path: inset(0 0 calc(100% - var(--reveal)) 0);
       z-index: 2;
       pointer-events: none;
@@ -89,7 +93,7 @@
       }
     }
 
-    /* Slider wrapper pinned to image */
+    /* Slider area */
     .slider {
       position: absolute;
       top: 12px;
@@ -98,22 +102,20 @@
       width: 28px;
       z-index: 5;
       display: flex;
-      justify-content: centre;
+      justify-content: center;
       align-items: stretch;
     }
 
-    /* Full-height track */
     .slider-track {
       position: relative;
       width: 6px;
       height: 100%;
       border-radius: 999px;
-      background: rgba(255,255,255,0.65);
+      background: rgba(255,255,255,0.7);
       box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
       cursor: pointer;
     }
 
-    /* Draggable thumb */
     .slider-thumb {
       position: absolute;
       left: 50%;
@@ -121,7 +123,7 @@
       height: 24px;
       border-radius: 50%;
       background: #222;
-      border: 3px solid white;
+      border: 3px solid #fff;
       box-shadow: 0 2px 6px rgba(0,0,0,0.25);
       transform: translateX(-50%);
       cursor: grab;
@@ -144,3 +146,72 @@
       <img src="iceberg-base.png" class="base" alt="Iceberg image" />
 
       <div class="overlay-layer" id="overlayLayer"></div>
+      <div class="waterline"></div>
+
+      <div class="slider" aria-label="Reveal slider">
+        <div class="slider-track" id="sliderTrack">
+          <div class="slider-thumb" id="sliderThumb"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener("load", () => {
+      const track = document.getElementById("sliderTrack");
+      const thumb = document.getElementById("sliderThumb");
+      const root = document.documentElement;
+
+      let value = 40; // starting reveal percentage
+      let dragging = false;
+
+      function setReveal(percent) {
+        value = Math.max(0, Math.min(100, percent));
+        root.style.setProperty("--reveal", value + "%");
+
+        const trackHeight = track.clientHeight;
+        const thumbHeight = thumb.offsetHeight;
+
+        const thumbY = (value / 100) * trackHeight - (thumbHeight / 2);
+        const clampedY = Math.max(0, Math.min(trackHeight - thumbHeight, thumbY));
+
+        thumb.style.top = `${clampedY}px`;
+      }
+
+      function updateFromPointer(clientY) {
+        const rect = track.getBoundingClientRect();
+        const y = clientY - rect.top;
+        const percent = (y / rect.height) * 100;
+        setReveal(percent);
+      }
+
+      thumb.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        thumb.setPointerCapture(e.pointerId);
+      });
+
+      window.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        updateFromPointer(e.clientY);
+      });
+
+      window.addEventListener("pointerup", () => {
+        dragging = false;
+      });
+
+      track.addEventListener("click", (e) => {
+        updateFromPointer(e.clientY);
+      });
+
+      window.addEventListener("resize", () => {
+        setReveal(value);
+      });
+
+      requestAnimationFrame(() => {
+        setReveal(value);
+      });
+    });
+  </script>
+
+</body>
+</html>
